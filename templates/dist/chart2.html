@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.9">
+    <title>全国农产品价格分析大屏</title>
+    <link rel="stylesheet" href="../static/css/index.css" />
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/formcss.css') }}">
+    <style>
+        .sidebar{
+            position: absolute;
+            z-index: 30000;
+        }
+    
+    </style>
+</head>
+<body style="margin: 0;">
+    <div style="border-top: 50px solid #428bca;"></div>
+    <!-- 实时更新日期和时间 -->
+    <div id="datetime" style="text-align: center; color: lightcyan; margin-top: 10px;font-weight: bold;font-size:20px;"></div>
+    <div style="text-align: center; color: white; font-size: 30px;margin-top: 30px;">价格变化情况滚动表</div>
+
+    <script src="{{ url_for('static',filename='js/time.js')}}"></script>
+    <script src="{{ url_for('static',filename='js/theme.js')}}"></script>
+    <script src="{{ url_for('static',filename='js/echarts.js')}}"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div style="position: relative; border-top: 50px solid #428bca;">
+            <div style="position: absolute; top: -40px; left: 0px; right: 0; text-align: center; color: white; font-size: 25px;">数据可视化</div>
+        </div>
+        <a href="/index" style="display: block; text-align: center; ">总览</a>
+        <a href="/chart1" style="display: block; text-align: center; ">价格变化趋势折线图</a>
+        <a href="/chart2" style="display: block; text-align: center; ">价格变化情况滚动表</a>
+        <a href="/chart3" style="display: block; text-align: center; ">价格变化柱状图</a>
+        <a href="/chart4" style="display: block; text-align: center; ">价格对比雷达图</a>
+        <a href="/chart5" style="display: block; text-align: center; ">最低价变化饼图</a>
+        <a href="/predict" style="display: block; text-align: center; ">未来7日价格预测</a>
+    </div>
+
+    <center>
+        <div class="container" style="align-items: center; position: relative;">
+            <div class="map" style="width:1500px;height:700px;">
+                <div class="map" style="width:1500px;height:700px;alige:center;">
+                    <div class="map1"></div>
+                    <div class="map2"></div>
+                    <div class="map3"></div>
+                    <div class="chart"></div>
+                </div>
+            </div>
+            <div class="tablebox" style=" position: absolute; top: 33%; left: 50%; transform: translate(-50%, -50%);">
+                <div class="tbl-header" >
+                    <table border="0" cellspacing="0" cellpadding="0">
+                        <thead style="opacity: 1;">
+                            <tr>
+                                <th>日期</th>
+                                <th>最低价(元)</th>
+                                <th>最高价(元)</th>
+                                <th>日均价(元)</th>
+                            </tr>
+                        </thead>
+                        <tbody style="opacity:0;"></tbody>
+                    </table>
+                </div>
+                <div class="tbl-body">
+                    <table border="0" cellspacing="0" cellpadding="0">
+                        <thead >
+                            <tr>
+                                <th>日期</th>
+                                <th>最低价(元)</th>
+                                <th>最高价(元)</th>
+                                <th>日均价(元)</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- 农产品查询表单 -->
+        <div style="text-align: center; bottom: 20px; position: absolute; left: 38%; ">
+            <form id="form" name="form" method='POST' action='/chart2' style="display: inline-block; text-align: left;">
+                <h1 style="color: white;">请输入农产品名：
+                    <input type="text" name="product" style="height:50px;width:160px;font-size:30px;">
+                    <input type="submit" value="点击查询">
+                </h1>
+            </form>
+        </div>
+    </center>
+
+    <script>
+        $(document).ready(function() {
+            var Items = {{dict_return['data_tb']|tojson}};
+            var str = '';
+            $.each(Items, function (i, item) {
+                str += '<tr>' +
+                    '<td>' + item.date + '</td>' +
+                    '<td>' + item.low_price + '</td>' +
+                    '<td>' + item.high_price + '</td>' +
+                    '<td>' + item.price + '</td>' +
+                    '</tr>';
+            });
+            $('.tbl-body tbody').append(str);
+            $('.tbl-header tbody').append(str);
+
+            if (Items.length > 5) {
+                $('.tbl-body tbody').html($('.tbl-body tbody').html() + $('.tbl-body tbody').html());
+                $('.tbl-body').css('top', '0');
+                var tblTop = 0;
+                var speedhq = 50; // 数值越大越慢
+                var outerHeight = $('.tbl-body tbody').find("tr").outerHeight();
+                var MyMarhq = setInterval(Marqueehq, speedhq);
+
+                $(".tbl-header tbody").hover(function () {
+                    clearInterval(MyMarhq);
+                }, function () {
+                    clearInterval(MyMarhq);
+                    MyMarhq = setInterval(Marqueehq, speedhq);
+                });
+
+                function Marqueehq() {
+                    if (tblTop <= -outerHeight * Items.length) {
+                        tblTop = 0;
+                    } else {
+                        tblTop -= 1;
+                    }
+                    $('.tbl-body').css('top', tblTop + 'px');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

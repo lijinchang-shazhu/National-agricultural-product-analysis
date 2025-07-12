@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+
+    <style>
+        .container {
+            margin-top: 20px;
+        }
+        .tab-content {
+            margin-top: 20px;
+            
+            padding: 20px;
+            border-top: none;
+            width: 1300px;
+        }
+        .container ul{
+            width: 1200px;
+
+        }
+        
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/styleAP.css">
+</head>
+
+<body>
+    <!-- 头部模块 -->
+    <div class="header">
+        <div class="title">
+            <span>算法预测展示系统</span>
+        </div>
+        <div class="time">
+            <span></span>
+        </div>
+
+    </div>
+
+    <!-- 主题模块 -->
+    <div class="main">
+        <div class="container">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="auto-reg-tab" data-toggle="tab" href="#auto-reg" role="tab">AutoRegression</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="dt-reg-tab" data-toggle="tab" href="#dt-reg" role="tab">DecisionTreeRegression</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="lasso-reg-tab" data-toggle="tab" href="#lasso-reg" role="tab">LassoRegression</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="linear-reg-tab" data-toggle="tab" href="#linear-reg" role="tab">LinearRegression</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="lstm-tab" data-toggle="tab" href="#lstm" role="tab">LSTM</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="nn-tab" data-toggle="tab" href="#nn" role="tab">NeuralNetwork</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="ridge-reg-tab" data-toggle="tab" href="#ridge-reg" role="tab">RidgeRegression</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="xgb-reg-tab" data-toggle="tab" href="#xgb-reg" role="tab">XGBoostRegression</a>
+                </li>
+            </ul>
+        
+           <!-- Tab panes -->
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="auto-reg" role="tabpanel" aria-labelledby="auto-reg-tab">
+                <select id="model-select-auto-reg" class="form-select"></select>
+                <div id="chart-autoregression" style="width: 1000px; height: 400px;"></div>
+                <!-- Add other content or chart containers here -->
+            </div>
+            <div class="tab-pane fade" id="dt-reg" role="tabpanel" aria-labelledby="dt-reg-tab">
+                <select id="model-select-dt-reg" class="form-select"></select>
+                <div id="chart-decisiontreeregression" style="width: 1000px; height: 400px;"></div>
+                <!-- Add other content or chart containers here -->
+            </div>
+            <div class="tab-pane fade" id="lasso-reg" role="tabpanel" aria-labelledby="lasso-reg-tab">
+                <select id="model-select-lasso-reg" class="form-select"></select>
+                <div id="chart-lassoregression" style="width: 1000px; height: 400px;"></div>
+                <!-- Add other content or chart containers here -->
+            </div>
+            <div class="tab-pane fade" id="linear-reg" role="tabpanel" aria-labelledby="linear-reg-tab">
+                <select id="model-select-linear-reg" class="form-select"></select>
+                <div id="chart-linearregression" style="width: 1000px; height: 400px;"></div>
+                <!-- Add other content or chart containers here -->
+            </div>
+            <div class="tab-pane fade" id="lstm" role="tabpanel" aria-labelledby="lstm-tab">
+                <select id="model-select-lstm" class="form-select"></select>
+                <div id="chart-lstm" style="width:1000px; height: 400px;"></div>
+                <!-- Add other content or chart containers here -->
+            </div>
+            <div class="tab-pane fade" id="nn" role="tabpanel" aria-labelledby="nn-tab">
+                <select id="model-select-nn" class="form-select"></select>
+                <div id="chart-neuralnetwork" style="width: 1000px; height: 400px;"></div>
+                <!-- Add other content or chart containers here -->
+            </div>
+            <div class="tab-pane fade" id="ridge-reg" role="tabpanel" aria-labelledby="ridge-reg-tab">
+                <select id="model-select-ridge-reg" class="form-select"></select>
+                <div id="chart-ridgeregression" style="width: 1000px; height: 400px;"></div>
+                <!-- Add other content or chart containers here -->
+            </div>
+            <div class="tab-pane fade" id="xgb-reg" role="tabpanel" aria-labelledby="xgb-reg-tab">
+                <select id="model-select-xgb-reg" class="form-select"></select>
+                <div id="chart-xgboostregression" style="width: 1000px; height: 400px;"></div>
+                <!-- Add other content or chart containers here -->
+            </div>
+        </div>
+
+        </div>
+        
+
+
+    </div>
+    <script>
+        $(document).ready(function() {
+    $('.nav-tabs a').on('click', function(e) {
+        e.preventDefault();
+        var tabName = $(this).text().trim();  // Extract tab name
+        var tabId = $(this).attr('href').substring(1);  // Extract the ID of the tab content
+
+        updateDropdown(tabId, tabName);  // Update the dropdown based on the selected tab
+    });
+
+    function updateDropdown(tabId, tabName) {
+        var selectId = `#model-select-${tabId}`;
+        $.ajax({
+            url: '/tab_clicked',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 'tabName': tabName }),
+            success: function(response) {
+                if (response.status === 'success') {
+                    var selectElement = $(selectId);
+                    selectElement.empty(); // Clear previous options
+                    response.models.forEach(function(model) {
+                        selectElement.append($('<option>', { value: model, text: model }));
+                    });
+                    attachChangeEvent(selectId, tabName);  // Attach the change event after updating options
+                } else {
+                    console.error('Failed to fetch models:', response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching models:', error);
+            }
+        });
+    }
+
+    function attachChangeEvent(selectId, tabName) {
+        $(selectId).change(function() {
+            var modelName = $(this).val();
+            fetchChartData(tabName, modelName);
+        }).change();  // Trigger change to load initial chart
+    }
+
+    function fetchChartData(tabName, modelName) {
+        $.ajax({
+            url: '/get_data',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ tabName: tabName, modelName: modelName }),
+            success: function(data) {
+                console.log('Data received:', data);
+                var chartId = `chart-${tabName.toLowerCase().replace(/ /g, '-')}`;
+                renderChart(chartId, data);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching data:', error);
+            }
+        });
+    }
+
+    function renderChart(chartId, data) {
+        console.log("Chart container ID:", chartId);
+
+        var chartDom = document.getElementById(chartId);
+        if (!chartDom) {
+        console.error("Chart container not found:", chartId);
+        return;  // 如果找不到元素，中断执行
+    }
+        var myChart = echarts.init(chartDom);
+        var option = {
+            title: { text: 'Model Performance' },
+            tooltip: { trigger: 'axis' },
+            xAxis: { type: 'category', data: data.ids },
+            yAxis: { type: 'value' },
+            series: [{
+                data: data.prices,
+                type: 'line',
+                markLine: { data: [{ type: 'average', name: 'Average' }] },
+                markPoint: {
+                    data: [
+                        { type: 'max', name: 'Max' },
+                        { type: 'min', name: 'Min' }
+                    ]
+                }
+            }]
+        };
+        myChart.setOption(option);
+    }
+});
+
+        </script>
+        
+</body>
+
+</html>

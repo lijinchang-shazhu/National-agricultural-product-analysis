@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全国农产品价格分析大屏</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css')}}">
+    <link rel="stylesheet" href="../static/css/login.css">
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('../static/images/bg.jpg'); /* 设置背景图片 */
+            background-size: cover; /* 背景图片铺满整个屏幕 */
+            background-position: center; /* 背景图片居中 */
+        }
+
+        .map {
+            width: 100%;
+            height: 100vh; /* 设置高度为视口的100% */
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 20px; /* 可根据需要调整内边距 */
+        }
+
+        .map1, .map2, .map3, .chart {
+            flex: 1;
+            /* 添加您想要的样式 */
+        }
+
+
+    </style>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Your existing HTML content -->
+
+  <div class="modal" id="errorModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Error</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          <p>{{ error }}</p>
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Your existing HTML content -->
+  <div class="map">
+       <div class="map1"></div>
+        <div class="map2"></div>
+        <div class="map3"></div>
+        <div class="chart"></div>
+      <p style="color: white; font-size: 50px;font-weight: bold; margin-top: 350px;margin-left: 210px;position: absolute; z-index: 999;">全国农产品价格分析系统</p>
+
+    </div>
+
+   <section>
+        <div class="box">
+            <div class="form">
+                <h2>Login to your Account</h2>
+                <form class="" action="/login" method="post" enctype="multipart/form-data">
+                    <div class="inputBx">
+                        <input type="text" name="username" placeholder="Username" id="username" oninput="validation()" required autofocus>
+                        <img src="../static/images/user.png" alt="">
+                    </div>
+                    <div class="inputBx">
+                        <input type="password" name="password" id="password" placeholder="Password" oninput="validation()" required>
+                        <img src="../static/images/lock.png" alt="">
+                    </div>
+                    <label class="remember" style="color: white;"><input type="checkbox">Remember Me</label>
+                    <div class="inputBx" style="display: flex; justify-content: center;">
+                        <input type="submit" name="submit" value="Login" id="submit" disabled>
+                    </div>
+                </form>
+                <div>
+                    <span style="float: left;"><a href="#">Forgot Password </a></span>
+                    <span style="float:right;"><a href="#">Sign-in</a></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script type="text/javascript">
+    	function validation() {
+		    let username = document.getElementById("username").value;
+		    let pass = document.getElementById("password").value;
+		    if (username != "" && pass != "") {
+		        document.getElementById("submit").disabled = false;
+		    } else {
+		        document.getElementById("submit").disabled = true;
+		    }
+		}
+    </script>
+  <!-- 引入 jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- 引入 Bootstrap JS -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    $(document).ready(function(){
+      // Show the error modal if the error variable is present
+      {% if error %}
+      $("#errorModal").modal('show');
+      {% endif %}
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+        <div class="tablebox" style="height: 260px; width: 450px; margin-top: -350px; margin-left:40%;opacity: 0.7;">
+            <div class="tbl-header">
+                <table border="0" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>最低价(元)</th>
+                            <th>最高价(元)</th>
+                            <th>日均价(元)</th>
+                        </tr>
+                    </thead>
+                    <tbody style="opacity:0;"></tbody>
+                </table>
+            </div>
+            <div class="tbl-body">
+                <table border="0" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>最低价(元)</th>
+                            <th>最高价(元)</th>
+                            <th>日均价(元)</th>
+                        </tr>
+                    </thead>
+                    <tbody ></tbody>
+                </table>
+            </div>
+        </div>

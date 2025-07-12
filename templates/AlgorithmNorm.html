@@ -1,0 +1,319 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>算法性能评估</title>
+<link rel="stylesheet" type="text/css" href="../static/css/indexAN.css">
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<style>
+	.tb>table tr:hover{
+		background:#0B2A46;
+	}
+	.container ul{
+            width: 1200px;
+
+        }
+		.chart {
+            width: 100%;
+            height: 350px;
+			z-index: 100;
+        }
+        
+</style>
+</head>
+<body>
+
+	<div class="wrap">
+		<div class="wid_1820">
+
+			<div class="header">
+				<p class="tmtext"><span>2024-4-08 &emsp;&emsp;<span>14:39</span></span></p>
+				<p><span class="hefont" >算法性能评估</span></p>
+			</div>
+			<div class="container">
+				<!-- Nav tabs -->
+				<ul class="nav nav-tabs" id="myTab" role="tablist">
+					<li class="nav-item">
+						<a class="nav-link active" id="auto-reg-tab" data-toggle="tab" href="#auto-reg" role="tab">AutoRegression</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="dt-reg-tab" data-toggle="tab" href="#dt-reg" role="tab">DecisionTreeRegression</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="lasso-reg-tab" data-toggle="tab" href="#lasso-reg" role="tab">LassoRegression</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="linear-reg-tab" data-toggle="tab" href="#linear-reg" role="tab">LinearRegression</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="lstm-tab" data-toggle="tab" href="#lstm" role="tab">LSTM</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="nn-tab" data-toggle="tab" href="#nn" role="tab">NeuralNetwork</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="ridge-reg-tab" data-toggle="tab" href="#ridge-reg" role="tab">RidgeRegression</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="xgb-reg-tab" data-toggle="tab" href="#xgb-reg" role="tab">XGBoostRegression</a>
+					</li>
+				</ul>
+			</div>
+			<div class="content"> <img class="guang" src="../static/img/title.png"/>
+				<div class="tb tb_left">
+					<h3>MSE(平均绝对误差)</h3>
+					<!-- 添加图表容器 -->
+					<div class="chart" id="mse-container" style="height: 350px;"></div>
+
+				</div>
+				<div class="tb tb_right">
+					<h3>RMSE(均方根误差)</h3>
+					<!-- 添加图表容器 -->
+					<div class="chart" id="rmse-container" style="height: 350px;"></div>
+
+
+				</div>
+				<div style="clear:both"></div>
+				<div class="tb tb_left">
+					<h3>R2(决定系数)</h3>
+					<!-- 添加图表容器 -->
+					<div class="chart" id="r2-container" style="height: 350px;"></div>
+
+
+				</div>
+				<div class="tb tb_right">
+					<h3>PR(预测准确率)</h3>
+					<!-- 添加图表容器 -->
+					<div class="chart" id="pr-container" style="height: 350px;"></div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+<script>
+$(document).ready(function() {
+    $('.nav-link').click(function() {
+        var algorithmName = $(this).text().trim();  // Get the text content of the clicked tab
+
+        // Clear previous charts if any
+        // $('#mse-container').empty();
+        // $('#rmse-container').empty();
+        // $('#r2-container').empty();
+        // $('#pr-container').empty();
+
+        $.ajax({
+            url: '/fetch_data',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ algorithmName: algorithmName }),
+            success: function(data) {
+				console.log("Data received:", data); // Check the format of received data
+
+                // Create and draw charts with received data
+                drawChartMSE('mse-container', data.mse, "MSE (平均绝对误差)");
+                drawChartRMSE('rmse-container', data.rmse, "RMSE (均方根误差)");
+                drawChartR2('r2-container', data.r2, "R2 (决定系数)");
+                drawPerformanceChart('pr-container', data.pr);  // Different as it needs to handle categories
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching data:", error);
+            }
+        });
+    });
+
+    function drawChartMSE(containerId, data, title) {
+        var myChart = echarts.init(document.getElementById(containerId));
+        var option = {
+            title: {
+                text: title
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: data.map(item => item['数据集名称'])
+            },
+            yAxis: {
+                type: 'value'
+            },
+			
+			dataZoom: [
+            {
+                type: 'slider', // 这是一个滑动条类型的 dataZoom
+                start: 0,       // 开始位置（0%）
+                end: 100        // 结束位置（100%）
+            },
+            {
+                type: 'inside', // 这允许用户通过鼠标滚轮或触摸板手势进行缩放
+                start: 0,
+                end: 100
+            }
+        ],
+            series: [{
+                data: data.map(item => item["平均绝对误差"]),
+                type: 'bar',
+                barWidth: '60%',
+                smooth: true,
+                itemStyle: {
+                    borderRadius: 5  // Rounded bars
+                }
+            }]
+        };
+        myChart.setOption(option);
+    }
+
+    function drawChartRMSE(containerId, data, title) {
+        var myChart = echarts.init(document.getElementById(containerId));
+        var option = {
+            title: {
+                text: title
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: data.map(item => item['数据集名称'])
+            },
+            yAxis: {
+                type: 'value'
+            },
+			
+			dataZoom: [
+            {
+                type: 'slider', // 这是一个滑动条类型的 dataZoom
+                start: 0,       // 开始位置（0%）
+                end: 100        // 结束位置（100%）
+            },
+            {
+                type: 'inside', // 这允许用户通过鼠标滚轮或触摸板手势进行缩放
+                start: 0,
+                end: 100
+            }
+        ],
+            series: [{
+                data: data.map(item => item["均方根误差"]),
+                type: 'bar',
+                barWidth: '60%',
+                smooth: true,
+                itemStyle: {
+                    borderRadius: 5  // Rounded bars
+                }
+            }]
+        };
+        myChart.setOption(option);
+    }
+	
+	function drawChartR2(containerId, data, title) {
+        var myChart = echarts.init(document.getElementById(containerId));
+        var option = {
+            title: {
+                text: title
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: data.map(item => item['数据集名称'])
+            },
+            yAxis: {
+                type: 'value'
+            },
+			
+			dataZoom: [
+            {
+                type: 'slider', // 这是一个滑动条类型的 dataZoom
+                start: 0,       // 开始位置（0%）
+                end: 100        // 结束位置（100%）
+            },
+            {
+                type: 'inside', // 这允许用户通过鼠标滚轮或触摸板手势进行缩放
+                start: 0,
+                end: 100
+            }
+        ],
+            series: [{
+                data: data.map(item => item["决定系数"]),
+                type: 'bar',
+                barWidth: '60%',
+                smooth: true,
+                itemStyle: {
+                    borderRadius: 5  // Rounded bars
+                }
+            }]
+        };
+        myChart.setOption(option);
+    }
+	
+	function drawPerformanceChart(containerId, data) {
+        var myChart = echarts.init(document.getElementById(containerId));
+        var option = {
+            title: {
+                text: "PR (预测准确率)"
+            },
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                top: '5%',
+                left: 'center'
+            },
+			dataZoom: [
+            {
+                type: 'slider', // 这是一个滑动条类型的 dataZoom
+                start: 0,       // 开始位置（0%）
+                end: 100        // 结束位置（100%）
+            },
+            {
+                type: 'inside', // 这允许用户通过鼠标滚轮或触摸板手势进行缩放
+                start: 0,
+                end: 100
+            }
+        ],
+            series: [{
+                name: 'Performance',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: '40',
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: [
+                    { value: data['优秀'], name: '优秀' },
+                    { value: data['良好'], name: '良好' },
+                    { value: data['差'], name: '差' }
+                ]
+            }]
+        };
+        myChart.setOption(option);
+    }
+});
+</script>
